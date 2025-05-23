@@ -1,11 +1,12 @@
 import { customPatrol } from "../components/customPatrol";
 import { k } from "../context";
 import { makePlayer } from "../entities/player";
+import { handleKeyEvents } from "../events/keys";
 import { LEVELS } from "../utils/constants";
 import { LevelConfig } from "../utils/types";
 
 export function levelScene(
-  { type, levelId, coins }: LevelConfig = {
+  { type = "level", levelId = 0, coins = 0 }: LevelConfig = {
     type: "level",
     levelId: 0,
     coins: 0,
@@ -109,4 +110,6 @@ export function levelScene(
   k.onKeyPress("r", () => {
     k.go("levelx");
   });
+
+  handleKeyEvents();
 }

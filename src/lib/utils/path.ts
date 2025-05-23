@@ -3,7 +3,24 @@ import { DIRECTIONS_DIAGONAL, DIRECTIONS_NORMAL } from "./constants";
 import type { Vec2 } from "kaplay";
 import type { LevelXObj } from "../components/levelx";
 import type { TileXObj } from "../components/tilex";
-import { forEachNeighbor } from "./shared";
+import { Direction } from "./types";
+
+export function forEachNeighbor(
+  level: LevelXObj,
+  tile: TileXObj,
+  directions: Direction[],
+  cb: (neighbor: TileXObj, direction: Direction) => void
+) {
+  for (const direction of directions) {
+    const neighbor = level.tileFromTilePos(
+      tile.tilePos.add(direction.dx, direction.dy)
+    );
+
+    if (neighbor) {
+      cb(neighbor, direction);
+    }
+  }
+}
 
 function heuristic(a: Vec2, b: Vec2, allowDiagonals: boolean): number {
   if (allowDiagonals) {
@@ -67,38 +84,37 @@ export function aStar(
 
     closeSet.add(currentNode.tile);
 
-    for (const direction of directions) {
-      const neighborTile = level.tileFromTilePos(
-        currentNode.tile.tilePos.add(direction.dx, direction.dy)
-      );
+    forEachNeighbor(
+      level,
+      currentNode.tile,
+      directions,
+      (neighbor, direction) => {
+        if (
+          !neighbor ||
+          neighbor.isObstacle ||
+          (objsAsObstacles && neighbor.hasAny()) ||
+          closeSet.has(neighbor)
+        ) {
+          return;
+        }
 
-      if (
-        !neighborTile ||
-        neighborTile.isObstacle ||
-        (objsAsObstacles && neighborTile.hasAny()) ||
-        closeSet.has(neighborTile)
-      ) {
-        continue;
+        const g =
+          currentNode.g +
+          (direction.dx !== 0 && direction.dy !== 0 ? Math.SQRT2 : 1);
+        const h = heuristic(neighbor.tilePos, end.tilePos, allowDiagonals);
+        const existing = openList.find((node) => node.tile.id === neighbor.id);
+
+        if (!existing || g < existing.g) {
+          openList.push({
+            tile: neighbor,
+            g,
+            h,
+            f: g + h,
+            parent: currentNode,
+          });
+        }
       }
-
-      const g =
-        currentNode.g +
-        (direction.dx !== 0 && direction.dy !== 0 ? Math.SQRT2 : 1);
-      const h = heuristic(neighborTile.tilePos, end.tilePos, allowDiagonals);
-      const existing = openList.find(
-        (node) => node.tile.id === neighborTile.id
-      );
-
-      if (!existing || g < existing.g) {
-        openList.push({
-          tile: neighborTile,
-          g,
-          h,
-          f: g + h,
-          parent: currentNode,
-        });
-      }
-    }
+    );
 
     forEachNeighbor(
       level,

@@ -2,5 +2,12 @@ import { LevelXPlugin } from "./plugin";
 
 export default LevelXPlugin;
 
-export type { LevelXComp } from "./components/levelx";
-export type { TileXComp } from "./components/tilex";
+export type {
+  LevelTilesDef,
+  LevelXComp,
+  LevelXObj,
+  LevelXOpt,
+  LevelXTileFunc,
+  PathingOpts,
+} from "./components/levelx";
+export type { TileXComp, TileXObj, TileXOpt } from "./components/tilex";

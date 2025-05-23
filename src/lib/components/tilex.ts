@@ -1,11 +1,14 @@
-import type { Comp, GameObj, PosComp, Vec2 } from "kaplay";
+import type { Comp, GameObj, KAPLAYCtx, PosComp, Vec2 } from "kaplay";
 
-import assert from "assert";
+import { assert } from "../utils/general";
 import { hasLevelX } from "../utils/shared";
 
 export interface TileXComp extends Comp {
   isObstacle: boolean;
   tilePos: Vec2;
+  obstacleArea: Vec2[];
+
+  onAdded(): void;
 
   addObj(obj: GameObj): void;
   hasObj(obj: GameObj): boolean;
@@ -18,14 +21,48 @@ export interface TileXComp extends Comp {
 
 export type TileXObj = GameObj<TileXComp | PosComp>;
 
-export function tileX(tilePos: Vec2, isObstacle = false): TileXComp {
+export interface TileXOpt {
+  isObstacle?: boolean;
+  obstacleArea?: Vec2[];
+}
+
+export function tileX(
+  k: KAPLAYCtx,
+  { isObstacle = false, obstacleArea = [] }: TileXOpt = {}
+): TileXComp {
   const objs: Map<number, GameObj> = new Map();
 
   return {
     id: "tileX",
     require: ["pos"],
     isObstacle,
-    tilePos,
+    tilePos: k.vec2(),
+    obstacleArea,
+
+    onAdded(this: TileXObj) {
+      if (this.obstacleArea.length === 0) {
+        assert(this.parent);
+        assert(hasLevelX(this.parent));
+
+        let width = this.parent.tileWidth();
+        let height = this.parent.tileHeight();
+
+        if ((this as GameObj).width) {
+          width = (this as GameObj).width;
+        }
+
+        if ((this as GameObj).height) {
+          height = (this as GameObj).height;
+        }
+
+        this.obstacleArea = [
+          k.vec2(),
+          k.vec2(width, 0),
+          k.vec2(width, height),
+          k.vec2(0, height),
+        ];
+      }
+    },
 
     addObj(obj: GameObj) {
       assert(obj.id);
@@ -57,7 +94,7 @@ export function tileX(tilePos: Vec2, isObstacle = false): TileXComp {
 
       return this.pos.add(
         this.parent.tileWidth() / 2,
-        this.parent.tileHeight()
+        this.parent.tileHeight() / 2
       );
     },
   };

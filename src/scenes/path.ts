@@ -1,4 +1,5 @@
 import { k } from "../context";
+import { handleKeyEvents } from "../events/keys";
 import { TileXObj } from "../lib/components/tilex";
 
 export function pathScene(): void {
@@ -28,7 +29,12 @@ export function pathScene(): void {
             k.color(0, 150, 255),
             k.outline(1, k.rgb(255, 255, 255)),
           ],
-          x: (_, tilePos) => [k.tileX(tilePos, true)],
+          x: () => [
+            k.rect(32, 32),
+            k.color(255, 0, 0),
+            k.outline(1, k.rgb(255, 255, 255)),
+            k.tileX({ isObstacle: true }),
+          ],
         },
       }
     ),
@@ -145,4 +151,6 @@ export function pathScene(): void {
       tile.color = k.rgb(40, 40, 40);
     });
   });
+
+  handleKeyEvents();
 }

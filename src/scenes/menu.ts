@@ -1,4 +1,5 @@
 import { k } from "../context";
+import { makeButton } from "../entities/button";
 
 export function menuScene(): void {
   const scene = k.add([]);
@@ -11,61 +12,16 @@ export function menuScene(): void {
     k.anchor("center"),
   ]);
 
-  const play = scene.add([
-    k.text("Play Level"),
-    k.color(k.WHITE),
-    k.pos(k.center().add(0, 40)),
-    k.anchor("center"),
-    k.area(),
-  ]);
-  const playX = scene.add([
-    k.text("Play LevelX"),
-    k.color(k.WHITE),
-    k.pos(k.center().add(0, 80)),
-    k.anchor("center"),
-    k.area(),
-  ]);
-  const playPath = scene.add([
-    k.text("Play Path"),
-    k.color(k.WHITE),
-    k.pos(k.center().add(0, 120)),
-    k.anchor("center"),
-    k.area(),
-  ]);
-
-  play.onHover(() => {
-    play.color = k.GREEN;
+  makeButton(scene, k.center().add(0, 40), "Play Level", () => {
+    k.go("level", { levelId: 0 });
   });
-
-  play.onHoverEnd(() => {
-    play.color = k.WHITE;
+  makeButton(scene, k.center().add(0, 80), "Play LevelX", () => {
+    k.go("levelx", { levelId: 0 });
   });
-
-  play.onClick(() => {
-    k.go("level");
-  });
-
-  playX.onHover(() => {
-    playX.color = k.GREEN;
-  });
-
-  playX.onHoverEnd(() => {
-    playX.color = k.WHITE;
-  });
-
-  playX.onClick(() => {
-    k.go("levelx");
-  });
-
-  playPath.onHover(() => {
-    playPath.color = k.GREEN;
-  });
-
-  playPath.onHoverEnd(() => {
-    playPath.color = k.WHITE;
-  });
-
-  playPath.onClick(() => {
+  makeButton(scene, k.center().add(0, 120), "Play Path", () => {
     k.go("path");
+  });
+  makeButton(scene, k.center().add(0, 160), "Play Partitions", () => {
+    k.go("partitions");
   });
 }

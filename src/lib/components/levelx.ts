@@ -1,6 +1,6 @@
 import type { Comp, CompList, GameObj, KAPLAYCtx, PosComp, Vec2 } from "kaplay";
 import { aStar, tilesInRange } from "../utils/path";
-import { generateRectanglesFromLevelX } from "../utils/shapes";
+import { generatePolygonsFromLevelX } from "../utils/shapes";
 import { type TileXComp, type TileXObj, tileX } from "./tilex";
 
 export type LevelXTileFunc = (
@@ -134,7 +134,7 @@ export function levelX(
           }
 
           if (!hasPosComp) tileComps.push(k.pos(localPos));
-          if (!hasTileXComp) tileComps.push(tileX(tilePos));
+          if (!hasTileXComp) tileComps.push(tileX(k));
 
           const tileObj = this.add(tileComps);
 
@@ -142,20 +142,25 @@ export function levelX(
             tileObj.pos = tileObj.pos.add(localPos);
           }
 
+          tileObj.tilePos = tilePos;
+
+          tileObj.onAdded();
+
           tiles.push(tileObj);
         }
       }
 
       if (opt.generateObstacles) {
-        const rectangles = generateRectanglesFromLevelX(k, this);
+        const polygons = generatePolygonsFromLevelX(k, this);
 
-        for (const rectangle of rectangles) {
+        for (const polygon of polygons) {
           this.add([
             k.pos(),
             k.area({
-              shape: rectangle,
+              shape: polygon,
             }),
             k.body({ isStatic: true }),
+            "obstacle",
           ]);
         }
       }

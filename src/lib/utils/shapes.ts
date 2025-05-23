@@ -1,11 +1,16 @@
-import type { Anchor, GameObj, KAPLAYCtx, Rect, Vec2 } from "kaplay";
+import type { Anchor, GameObj, KAPLAYCtx, Polygon, Vec2 } from "kaplay";
 
 import { type LevelXObj } from "../components/levelx";
 import type { TileXObj } from "../components/tilex";
+import MergePolygons from "./polyMerger";
 
-function getOffset(k: KAPLAYCtx, level: LevelXObj, tile: TileXObj): Vec2 {
+export function getOffset(
+  k: KAPLAYCtx,
+  level: LevelXObj,
+  tile: TileXObj
+): Vec2 {
   if (!tile.has("anchor")) {
-    return k.vec2(0, 0);
+    return k.vec2();
   }
 
   const anchorProp = (tile as GameObj).anchor as Anchor | Vec2;
@@ -26,7 +31,7 @@ function getOffset(k: KAPLAYCtx, level: LevelXObj, tile: TileXObj): Vec2 {
       anchor = k.vec2(-1, 0);
       break;
     case "center":
-      anchor = k.vec2(0, 0);
+      anchor = k.vec2();
       break;
     case "right":
       anchor = k.vec2(1, 0);
@@ -50,65 +55,29 @@ function getOffset(k: KAPLAYCtx, level: LevelXObj, tile: TileXObj): Vec2 {
     .scale(k.vec2(level.tileWidth(), level.tileHeight()).scale(-0.5));
 }
 
-export function generateRectanglesFromLevelX(
+export function generatePolygonsFromLevelX(
   k: KAPLAYCtx,
   level: LevelXObj
-): Rect[] {
-  const visited = new Set<TileXObj>();
-  const rectangles: Rect[] = [];
+): Polygon[] {
+  const merger = new MergePolygons();
 
   level.tiles().forEach((tile) => {
     if (!tile) return;
-    if (visited.has(tile)) return;
     if (!tile.isObstacle) return;
-
-    const x = tile.tilePos.x;
-    const y = tile.tilePos.y;
-
-    let width = 0;
-    let height = 1;
-    let currentTile = level.tileFromTilePos(k.vec2(x + width, y));
-
-    while (currentTile && currentTile.isObstacle && !visited.has(currentTile)) {
-      width++;
-
-      currentTile = level.tileFromTilePos(k.vec2(x + width, y));
-    }
-
-    heightLoop: for (; y + height < level.numRows(); height++) {
-      for (let dx = 0; dx < width; dx++) {
-        currentTile = level.tileFromTilePos(k.vec2(x + dx, y + height));
-
-        if (
-          !currentTile ||
-          !currentTile.isObstacle ||
-          visited.has(currentTile)
-        ) {
-          break heightLoop;
-        }
-      }
-    }
-
-    for (let dy = 0; dy < height; dy++) {
-      for (let dx = 0; dx < width; dx++) {
-        currentTile = level.tileFromTilePos(k.vec2(x + dx, y + dy));
-
-        if (!currentTile) continue;
-
-        visited.add(currentTile);
-      }
-    }
 
     const offset: Vec2 = getOffset(k, level, tile);
 
-    rectangles.push(
-      new k.Rect(
-        k.vec2(tile.pos).add(offset),
-        width * level.tileWidth(),
-        height * level.tileHeight()
-      )
+    merger.addPolygon(
+      ...tile.obstacleArea.map((v) => v.add(tile.pos).add(offset))
     );
   });
 
-  return rectangles;
+  const convexes = merger.getConvexes();
+  const polygons: Polygon[] = [];
+
+  for (const convex of convexes) {
+    polygons.push(new k.Polygon(convex));
+  }
+
+  return polygons;
 }

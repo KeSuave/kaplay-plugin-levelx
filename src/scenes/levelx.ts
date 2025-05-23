@@ -1,13 +1,13 @@
-import { Vec2 } from "kaplay";
 import { customPatrol } from "../components/customPatrol";
 import { k } from "../context";
 import { makePlayer } from "../entities/player";
+import { handleKeyEvents } from "../events/keys";
 import { LevelXOpt } from "../lib/components/levelx";
 import { LEVELS } from "../utils/constants";
 import { LevelConfig } from "../utils/types";
 
 export function levelxScene(
-  { type, levelId, coins }: LevelConfig = {
+  { type = "level", levelId = 0, coins = 0 }: LevelConfig = {
     type: "levelx",
     levelId: 0,
     coins: 0,
@@ -21,20 +21,20 @@ export function levelxScene(
     tileWidth: 64,
     tileHeight: 64,
     tiles: {
-      "=": (_: Vec2, tilePos: Vec2) => [
+      "=": () => [
         k.sprite("grass"),
         k.color(255, 255, 255),
-        k.tileX(tilePos, true),
+        k.tileX({ isObstacle: true }),
         //k.body({ isStatic: true }),
         k.anchor("bot"),
         k.offscreen({ hide: true }),
         "platform",
         "obstacle",
       ],
-      "-": (_: Vec2, tilePos: Vec2) => [
+      "-": () => [
         k.sprite("steel"),
         k.color(255, 255, 255),
-        k.tileX(tilePos, true),
+        k.tileX({ isObstacle: true }),
         //k.body({ isStatic: true }),
         k.offscreen({ hide: true }),
         k.anchor("bot"),
@@ -112,4 +112,6 @@ export function levelxScene(
   k.onKeyPress("r", () => {
     k.go("level");
   });
+
+  handleKeyEvents();
 }

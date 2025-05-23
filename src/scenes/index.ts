@@ -4,7 +4,8 @@ import { gameOverScene } from "./gameOver";
 import { levelScene } from "./level";
 import { levelxScene } from "./levelx";
 import { menuScene } from "./menu";
-import { pathScene } from './path';
+import { partitionsScene } from "./partitions";
+import { pathScene } from "./path";
 
 export default function addScenes(): void {
   k.scene("boot", bootScene);
@@ -12,5 +13,6 @@ export default function addScenes(): void {
   k.scene("gameOver", gameOverScene);
   k.scene("level", levelScene);
   k.scene("levelx", levelxScene);
-  k.scene('path', pathScene);
+  k.scene("path", pathScene);
+  k.scene("partitions", partitionsScene);
 }

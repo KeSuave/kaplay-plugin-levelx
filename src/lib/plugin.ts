@@ -1,10 +1,10 @@
-import type { KAPLAYCtx, Vec2 } from "kaplay";
+import type { KAPLAYCtx } from "kaplay";
 import { levelX, type LevelXComp, type LevelXOpt } from "./components/levelx";
-import { tileX, type TileXComp } from "./components/tilex";
+import { tileX, TileXOpt, type TileXComp } from "./components/tilex";
 
 export interface LevelXPluginCtx {
   levelX(map: string[], opt: LevelXOpt): LevelXComp;
-  tileX(tilePos: Vec2, isObstacle?: boolean): TileXComp;
+  tileX(opt?: TileXOpt): TileXComp;
 }
 
 export function LevelXPlugin(k: KAPLAYCtx): LevelXPluginCtx {
@@ -12,8 +12,8 @@ export function LevelXPlugin(k: KAPLAYCtx): LevelXPluginCtx {
     levelX(map: string[], opt: LevelXOpt) {
       return levelX(k, map, opt);
     },
-    tileX(tilePos: Vec2, isObstacle = false) {
-      return tileX(tilePos, isObstacle);
+    tileX(opt?: TileXOpt) {
+      return tileX(k, opt);
     },
   };
 }
