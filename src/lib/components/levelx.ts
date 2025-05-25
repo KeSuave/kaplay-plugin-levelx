@@ -10,15 +10,73 @@ export type LevelXTileFunc = (
 ) => CompList<Comp | TileXComp | PosComp>;
 export type LevelTilesDef = Record<string, LevelXTileFunc>;
 
+/**
+ * Options for the `LevelX` component. These options define how the level is generated and what features it should have.
+ *
+ * @export
+ * @interface LevelXOpt
+ */
 export interface LevelXOpt {
+  /**
+   * The width of each tile in the level.
+   *
+   * @type {number}
+   * @memberof LevelXOpt
+   */
   tileWidth: number;
+  /**
+   * The height of each tile in the level.
+   *
+   * @type {number}
+   * @memberof LevelXOpt
+   */
   tileHeight: number;
+  /**
+   * Record of functions that define how each tile in the level should be generated.
+   *
+   * @type {LevelTilesDef}
+   * @memberof LevelXOpt
+   */
   tiles: LevelTilesDef;
-  generateObstacles?: boolean;
+  /**
+   * Whether to merge adjacent tiles into a single polygon for collision detection.
+   *
+   * @type {boolean}
+   * @memberof LevelXOpt
+   */
+  mergeObstacles?: boolean;
+  /**
+   * Tags to merge polygons by.
+   * If `undefined`, all obstacles will be merged.
+   *
+   * @type {string[]}
+   * @memberof LevelXOpt
+   */
+  mergeByTag?: string[];
+  /**
+   * Tags to be added to merged polygons.
+   *
+   * @type {string[]}
+   * @default ["obstacles"]
+   * @memberof LevelXOpt
+   */
+  mergeTags?: string[];
 }
 
 export interface PathingOpts {
+  /**
+   * Whether to treat game objects added to tiles as obstacles for pathfinding.
+   *
+   * @type {boolean}
+   * @memberof PathingOpts
+   */
   objsAsObstacles?: boolean;
+  /**
+   * Whether to allow diagonal movement for pathfinding.
+   *
+   * @type {boolean}
+   * @memberof PathingOpts
+   */
   allowDiagonals?: boolean;
 }
 
@@ -150,18 +208,28 @@ export function levelX(
         }
       }
 
-      if (opt.generateObstacles) {
-        const polygons = generatePolygonsFromLevelX(k, this);
+      if (opt.mergeObstacles) {
+        const mergers = generatePolygonsFromLevelX(k, this, opt.mergeByTag);
+        const tags = opt.mergeTags
+          ? opt.mergeTags
+          : opt.mergeByTag
+          ? []
+          : ["obstacle"];
 
-        for (const polygon of polygons) {
-          this.add([
-            k.pos(),
-            k.area({
-              shape: polygon,
-            }),
-            k.body({ isStatic: true }),
-            "obstacle",
-          ]);
+        for (const [tag, merger] of mergers) {
+          const convexes = merger.getConvexes();
+
+          for (const convex of convexes) {
+            this.add([
+              k.pos(),
+              k.area({
+                shape: new k.Polygon(convex),
+              }),
+              k.body({ isStatic: true }),
+              tag,
+              ...tags,
+            ]);
+          }
         }
       }
     },

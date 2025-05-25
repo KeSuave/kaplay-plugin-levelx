@@ -7,7 +7,7 @@ import { LEVELS } from "../utils/constants";
 import { LevelConfig } from "../utils/types";
 
 export function levelxScene(
-  { type = "level", levelId = 0, coins = 0 }: LevelConfig = {
+  { type = "levelx", levelId = 0, coins = 0 }: LevelConfig = {
     type: "levelx",
     levelId: 0,
     coins: 0,
@@ -65,8 +65,9 @@ export function levelxScene(
       ],
       "^": () => [
         k.sprite("spike"),
-        k.area(),
-        k.body({ isStatic: true }),
+        /* k.area(),
+        k.body({ isStatic: true }), */
+        k.tileX({ isObstacle: true }),
         k.anchor("bot"),
         k.offscreen({ hide: true }),
         "danger",
@@ -89,7 +90,8 @@ export function levelxScene(
         "portal",
       ],
     },
-    generateObstacles: true,
+    mergeObstacles: true,
+    mergeByTag: ["obstacle", "danger"],
   };
 
   const scene = k.add([]);
@@ -112,6 +114,11 @@ export function levelxScene(
   k.onKeyPress("r", () => {
     k.go("level");
   });
+
+  const obstacles = level.get("obstacle").filter((o) => o.has("area"));
+  const dangers = level.get("danger").filter((d) => d.has("area"));
+
+  k.debug.log(`Number of polygons: ${obstacles.length + dangers.length}`);
 
   handleKeyEvents();
 }

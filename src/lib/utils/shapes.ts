@@ -1,4 +1,4 @@
-import type { Anchor, GameObj, KAPLAYCtx, Polygon, Vec2 } from "kaplay";
+import type { Anchor, GameObj, KAPLAYCtx, Vec2 } from "kaplay";
 
 import { type LevelXObj } from "../components/levelx";
 import type { TileXObj } from "../components/tilex";
@@ -50,20 +50,43 @@ export function getOffset(
       break;
   }
 
-  return anchor
-    .add(1, 1)
-    .scale(k.vec2(level.tileWidth(), level.tileHeight()).scale(-0.5));
+  let width = level.tileWidth();
+  let height = level.tileHeight();
+
+  if ("width" in tile) {
+    width = tile.width as number;
+  }
+  if ("height" in tile) {
+    height = tile.height as number;
+  }
+
+  return anchor.add(1, 1).scale(k.vec2(width, height).scale(-0.5));
 }
 
 export function generatePolygonsFromLevelX(
   k: KAPLAYCtx,
-  level: LevelXObj
-): Polygon[] {
-  const merger = new MergePolygons();
+  level: LevelXObj,
+  mergeByTag: string[] = []
+): Map<string, MergePolygons> {
+  const mergers = new Map<string, MergePolygons>();
+
+  mergeByTag.forEach((tag) => mergers.set(tag, new MergePolygons()));
+
+  mergers.set("obstacle", new MergePolygons());
 
   level.tiles().forEach((tile) => {
     if (!tile) return;
     if (!tile.isObstacle) return;
+
+    let merger: MergePolygons = mergers.get("obstacle")!;
+
+    for (const tag of mergeByTag) {
+      if (tile.tags.includes(tag)) {
+        merger = mergers.get(tag)!;
+
+        break;
+      }
+    }
 
     const offset: Vec2 = getOffset(k, level, tile);
 
@@ -72,12 +95,5 @@ export function generatePolygonsFromLevelX(
     );
   });
 
-  const convexes = merger.getConvexes();
-  const polygons: Polygon[] = [];
-
-  for (const convex of convexes) {
-    polygons.push(new k.Polygon(convex));
-  }
-
-  return polygons;
+  return mergers;
 }

@@ -111,5 +111,10 @@ export function levelScene(
     k.go("levelx");
   });
 
+  const obstacles = level.get("obstacle").filter((o) => o.has("area"));
+  const dangers = level.get("danger").filter((d) => d.has("area"));
+
+  k.debug.log(`Number of polygons: ${obstacles.length + dangers.length}`);
+
   handleKeyEvents();
 }
