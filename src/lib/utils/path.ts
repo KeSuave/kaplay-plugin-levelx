@@ -3,7 +3,7 @@ import { DIRECTIONS_DIAGONAL, DIRECTIONS_NORMAL } from "./constants";
 import type { Vec2 } from "kaplay";
 import type { LevelXObj } from "../components/levelx";
 import type { TileXObj } from "../components/tilex";
-import { Direction } from "./types";
+import type { Direction } from "./types";
 
 export function forEachNeighbor(
   level: LevelXObj,

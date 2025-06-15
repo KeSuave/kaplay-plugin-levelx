@@ -1,4 +1,4 @@
-import { Direction } from "./types";
+import type { Direction } from "./types";
 
 export const DIRECTIONS_NORMAL: Direction[] = [
   { dx: -1, dy: 0 },

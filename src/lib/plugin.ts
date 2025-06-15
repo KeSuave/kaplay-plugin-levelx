@@ -1,6 +1,6 @@
 import type { KAPLAYCtx } from "kaplay";
 import { levelX, type LevelXComp, type LevelXOpt } from "./components/levelx";
-import { tileX, TileXOpt, type TileXComp } from "./components/tilex";
+import { tileX, type TileXComp, type TileXOpt } from "./components/tilex";
 
 export interface LevelXPluginCtx {
   levelX(map: string[], opt: LevelXOpt): LevelXComp;
