@@ -1,10 +1,10 @@
-import { customPatrol } from "../components/customPatrol";
-import { k } from "../context";
-import { makePlayer } from "../entities/player";
-import { handleKeyEvents } from "../events/keys";
-import { LevelXOpt } from "../lib/components/levelx";
 import { LEVELS } from "../utils/constants";
 import { LevelConfig } from "../utils/types";
+import { LevelXOpt } from "../../src/components/levelx";
+import { customPatrol } from "../components/customPatrol";
+import { handleKeyEvents } from "../events/keys";
+import { k } from "../context";
+import { makePlayer } from "../entities/player";
 
 export function levelxScene(
   { type = "levelx", levelId = 0, coins = 0 }: LevelConfig = {
@@ -98,6 +98,8 @@ export function levelxScene(
   const level = k.add([k.pos(), k.levelX(LEVELS[levelId ?? 0], levelConf)]);
   const player = makePlayer(scene, { type, levelId, coins }, level);
   const coinsLabel = k.add([k.text(`${coins}`), k.pos(24, 24), k.fixed()]);
+
+  player.paused = true;
 
   player.onCollide("coin", (c) => {
     k.destroy(c);

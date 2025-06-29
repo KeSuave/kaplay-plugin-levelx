@@ -1,5 +1,1 @@
-export interface LevelConfig {
-  type: "level" | "levelx";
-  levelId: number;
-  coins: number;
-}
+export type Direction = { dx: number; dy: number };

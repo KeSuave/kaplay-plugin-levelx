@@ -1,11 +1,11 @@
-import path from "path";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
+import path from "path";
 
 export default defineConfig({
   build: {
     lib: {
-      entry: path.resolve(__dirname, "src/lib/index.ts"),
+      entry: path.resolve(__dirname, "src/index.ts"),
       name: "kaplay-plugin-levelx",
       fileName: "kaplay-plugin-levelX",
     },
@@ -21,7 +21,7 @@ export default defineConfig({
   },
   plugins: [
     dts({
-      include: ["src/lib"],
+      include: ["src/"],
     }),
   ],
 });

@@ -1,6 +1,6 @@
-import { k } from "../context";
+import { TileXObj } from "../../src/components/tilex";
 import { handleKeyEvents } from "../events/keys";
-import { TileXObj } from "../lib/components/tilex";
+import { k } from "../context";
 
 export function pathScene(): void {
   const scene = k.add([]);

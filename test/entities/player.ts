@@ -11,9 +11,9 @@ import type {
 import { BigComp, big } from "../components/big";
 import { FALL_DEATH, JUMP_FORCE, LEVELS, MOVE_SPEED } from "../utils/constants";
 
-import { k } from "../context";
-import { LevelXObj } from "../lib/components/levelx";
 import { LevelConfig } from "../utils/types";
+import { LevelXObj } from "../../src/lib/components/levelx";
+import { k } from "../context";
 import { makeApple } from "./apple";
 
 export type PlayerEntityComps =

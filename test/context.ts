@@ -1,7 +1,7 @@
+import LevelXPlugin from "../src/";
+import addScenes from "./scenes";
 import { crew } from "@kaplayjs/crew";
 import kaplay from "kaplay";
-import LevelXPlugin from "./lib";
-import addScenes from "./scenes";
 
 export const k = kaplay({
   global: false,
