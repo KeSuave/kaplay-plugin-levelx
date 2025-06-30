@@ -11,3 +11,9 @@ export type {
   PathingOpts,
 } from "./components/levelx";
 export type { TileXComp, TileXObj, TileXOpt } from "./components/tilex";
+
+export {
+  convexPartition,
+  removeHoles,
+  triangulate,
+} from "./utils/polyPartitions";

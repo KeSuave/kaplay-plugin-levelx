@@ -90,7 +90,7 @@ export function levelScene(
     },
   };
 
-  const level = k.addLevel(LEVELS[levelId ?? 0], levelConf);
+  const level = k.addLevel(LEVELS[levelId], levelConf);
   const scene = k.add([]);
   const player = makePlayer(scene, { type, levelId, coins }, level);
   const coinsLabel = k.add([k.text(`${coins}`), k.pos(24, 24), k.fixed()]);
@@ -107,14 +107,12 @@ export function levelScene(
     });
   });
 
-  k.onKeyPress("r", () => {
-    k.go("levelx");
-  });
-
   const obstacles = level.get("obstacle").filter((o) => o.has("area"));
   const dangers = level.get("danger").filter((d) => d.has("area"));
 
   k.debug.log(`Number of polygons: ${obstacles.length + dangers.length}`);
 
   handleKeyEvents();
+
+  k.showFPS();
 }

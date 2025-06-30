@@ -1,12 +1,8 @@
-import {
-  convexPartition,
-  removeHoles,
-  triangulate,
-} from "../../src/utils/polyPartitions";
+import { convexPartition, removeHoles, triangulate } from "../../src";
 
 import type { Vec2 } from "kaplay";
-import { handleKeyEvents } from "../events/keys";
 import { k } from "../context";
+import { handleKeyEvents } from "../events/keys";
 
 export function partitionsScene(): void {
   const scene = k.add([]);

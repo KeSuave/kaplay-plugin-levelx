@@ -1,10 +1,10 @@
-import { LEVELS } from "../utils/constants";
-import { LevelConfig } from "../utils/types";
 import { LevelXOpt } from "../../src/components/levelx";
 import { customPatrol } from "../components/customPatrol";
-import { handleKeyEvents } from "../events/keys";
 import { k } from "../context";
 import { makePlayer } from "../entities/player";
+import { handleKeyEvents } from "../events/keys";
+import { LEVELS } from "../utils/constants";
+import { LevelConfig } from "../utils/types";
 
 export function levelxScene(
   { type = "levelx", levelId = 0, coins = 0 }: LevelConfig = {
@@ -92,14 +92,13 @@ export function levelxScene(
     },
     mergeObstacles: true,
     mergeByTag: ["obstacle", "danger"],
+    pauseOffScreenTiles: true,
   };
 
   const scene = k.add([]);
-  const level = k.add([k.pos(), k.levelX(LEVELS[levelId ?? 0], levelConf)]);
+  const level = k.add([k.pos(), k.levelX(LEVELS[levelId], levelConf)]);
   const player = makePlayer(scene, { type, levelId, coins }, level);
   const coinsLabel = k.add([k.text(`${coins}`), k.pos(24, 24), k.fixed()]);
-
-  player.paused = true;
 
   player.onCollide("coin", (c) => {
     k.destroy(c);
@@ -113,14 +112,12 @@ export function levelxScene(
     });
   });
 
-  k.onKeyPress("r", () => {
-    k.go("level");
-  });
-
   const obstacles = level.get("obstacle").filter((o) => o.has("area"));
   const dangers = level.get("danger").filter((d) => d.has("area"));
 
   k.debug.log(`Number of polygons: ${obstacles.length + dangers.length}`);
 
   handleKeyEvents();
+
+  k.showFPS();
 }

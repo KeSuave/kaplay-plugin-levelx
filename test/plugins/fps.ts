@@ -1,0 +1,28 @@
+import type { KAPLAYCtx } from "kaplay";
+
+export interface FpsPluginCtx {
+  showFPS(): void;
+}
+
+export function fpsPlugin(k: KAPLAYCtx): FpsPluginCtx {
+  return {
+    showFPS() {
+      k.add([k.pos(4, 4), k.rect(40, 20), k.color(k.BLACK), k.fixed()]);
+
+      const fps = k.add([
+        k.pos(24, 14),
+        k.text("0", {
+          size: 16,
+          width: 40,
+          align: "center",
+        }),
+        k.anchor("center"),
+        k.fixed(),
+      ]);
+
+      fps.onUpdate(() => {
+        fps.text = k.debug.fps().toString();
+      });
+    },
+  };
+}

@@ -61,6 +61,15 @@ export interface LevelXOpt {
    * @memberof LevelXOpt
    */
   mergeTags?: string[];
+  /**
+   * Pauses tiles not in view. Useful for large levels.
+   *
+   * Note: I suggest trying out `offscreen` first, especially for platformers.
+   *
+   * @type {boolean}
+   * @memberof LevelXOpt
+   */
+  pauseOffScreenTiles?: boolean;
 }
 
 export interface PathingOpts {
@@ -148,6 +157,12 @@ export function levelX(
   opt: LevelXOpt
 ): LevelXComp {
   const tiles: (TileXObj | null)[] = [];
+  const lastVisibleTileArea = {
+    minX: -1,
+    minY: -1,
+    maxX: -1,
+    maxY: -1,
+  };
 
   return {
     id: "levelX",
@@ -205,7 +220,16 @@ export function levelX(
           tileObj.onAdded();
 
           tiles.push(tileObj);
+
+          if (opt.pauseOffScreenTiles) {
+            tileObj.paused = true;
+            tileObj.hidden = true;
+          }
         }
+      }
+
+      if (opt.pauseOffScreenTiles) {
+        updatePausedTiles(k, this, lastVisibleTileArea);
       }
 
       if (opt.mergeObstacles) {
@@ -231,6 +255,11 @@ export function levelX(
             ]);
           }
         }
+      }
+    },
+    update(this: LevelXObj) {
+      if (opt.pauseOffScreenTiles) {
+        updatePausedTiles(k, this, lastVisibleTileArea);
       }
     },
 
@@ -361,4 +390,69 @@ export function levelX(
       );
     },
   };
+}
+
+interface lastVisibleTileArea {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
+function updatePausedTiles(
+  k: KAPLAYCtx,
+  levelXObj: LevelXObj,
+  lastVisibleTileArea: lastVisibleTileArea
+): void {
+  const camPos = k.getCamPos();
+  const screenLeft = camPos.x - k.width() / 2;
+  const screenTop = camPos.y - k.height() / 2;
+  const screenRight = screenLeft + k.width();
+  const screenBottom = screenTop + k.height();
+
+  const tileW = levelXObj.tileWidth();
+  const tileH = levelXObj.tileHeight();
+
+  const minX = Math.max(0, Math.floor((screenLeft - levelXObj.pos.x) / tileW));
+  const maxX = Math.min(
+    levelXObj.numCols() - 1,
+    Math.ceil((screenRight - levelXObj.pos.x) / tileW)
+  );
+  const minY = Math.max(0, Math.floor((screenTop - levelXObj.pos.y) / tileH));
+  const maxY = Math.min(
+    levelXObj.numRows() - 1,
+    Math.ceil((screenBottom - levelXObj.pos.y) / tileH)
+  );
+
+  if (
+    minX === lastVisibleTileArea.minX &&
+    maxX === lastVisibleTileArea.maxX &&
+    minY === lastVisibleTileArea.minY &&
+    maxY === lastVisibleTileArea.maxY
+  ) {
+    return;
+  }
+
+  const startX = Math.min(minX, lastVisibleTileArea.minX);
+  const startY = Math.min(minY, lastVisibleTileArea.minY);
+  const endX = Math.max(maxX, lastVisibleTileArea.maxX);
+  const endY = Math.max(maxY, lastVisibleTileArea.maxY);
+
+  for (let x = startX; x <= endX; x++) {
+    for (let y = startY; y <= endY; y++) {
+      const tile = levelXObj.tileFromTilePos(k.vec2(x, y));
+
+      if (!tile) continue;
+
+      const isVisible = x >= minX && x <= maxX && y >= minY && y <= maxY;
+
+      tile.paused = !isVisible;
+      tile.hidden = !isVisible;
+    }
+  }
+
+  lastVisibleTileArea.minX = minX;
+  lastVisibleTileArea.minY = minY;
+  lastVisibleTileArea.maxX = maxX;
+  lastVisibleTileArea.maxY = maxY;
 }

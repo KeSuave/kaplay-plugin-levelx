@@ -1,7 +1,8 @@
-import LevelXPlugin from "../src/";
-import addScenes from "./scenes";
 import { crew } from "@kaplayjs/crew";
 import kaplay from "kaplay";
+import LevelXPlugin from "../src";
+import { fpsPlugin } from "./plugins/fps";
+import addScenes from "./scenes";
 
 export const k = kaplay({
   global: false,
@@ -11,7 +12,7 @@ export const k = kaplay({
   debugKey: "u",
   debug: true, // TODO: set this to false in production
   background: [141, 183, 255],
-  plugins: [LevelXPlugin, crew],
+  plugins: [LevelXPlugin, crew, fpsPlugin],
 });
 
 addScenes();
