@@ -7,6 +7,8 @@ export interface FpsPluginCtx {
 export function fpsPlugin(k: KAPLAYCtx): FpsPluginCtx {
   return {
     showFPS() {
+      if (!k._k.globalOpt.debug) return;
+
       k.add([k.pos(4, 4), k.rect(40, 20), k.color(k.BLACK), k.fixed()]);
 
       const fps = k.add([

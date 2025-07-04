@@ -9,8 +9,8 @@ export type {
   LevelXOpt,
   LevelXTileFunc,
   PathingOpts,
-} from "./components/levelx";
-export type { TileXComp, TileXObj, TileXOpt } from "./components/tilex";
+} from "./components/levelX";
+export type { TileXComp, TileXObj, TileXOpt } from "./components/tileX";
 
 export {
   convexPartition,
